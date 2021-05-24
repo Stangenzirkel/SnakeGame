@@ -15,6 +15,9 @@ import snakegame.logic.CellType;
 import snakegame.logic.Direction;
 import snakegame.logic.Snake;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Author: Yuri Buyanov
  * Date: 24/05/2021 15:24
@@ -25,9 +28,13 @@ public class AppClass extends Application {
     private final int windowSizeX = indentSize + (cellSize + indentSize) * boardSizeX,
             windowSizeY = indentSize + (cellSize + indentSize) * boardSizeY;
 
-    private Canvas canvas;
-    public Board board;
     private final int playerId = 1;
+    private long timerSpeed = 200;
+
+    private Canvas canvas;
+    private Board board;
+
+    private Timer timer = new Timer();
 
     public static void main(String[] args) {
         launch(args);
@@ -36,6 +43,7 @@ public class AppClass extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         newGame();
+        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
 
         Group root = new Group();
         Scene scene = new Scene(root, windowSizeX, windowSizeY);
@@ -59,12 +67,7 @@ public class AppClass extends Application {
                     board.getSnake(playerId).setDirection(Direction.LEFT);
                 }
                 
-                board.makeTurn();
-                drawBoard();
-
-                if (board.getSnake(playerId) == null) {
-                    newGame();
-                }
+                // update();
             }
         });
 
@@ -77,13 +80,13 @@ public class AppClass extends Application {
         stage.show();
     }
 
-    public void newGame() {
+    private void newGame() {
         board = new Board(boardSizeX, boardSizeY);
         board.addSnake(5, 5, 1);
         board.addFood();
     }
 
-    public void drawBoard() {
+    private void drawBoard() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -97,5 +100,18 @@ public class AppClass extends Application {
                         cellSize);
             }
         }
+    }
+
+    private void update() {
+        timer.cancel();
+
+        board.makeTurn();
+        drawBoard();
+
+        if (board.getSnake(playerId) == null) {
+            newGame();
+        }
+        timer = new Timer();
+        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
     }
 }
