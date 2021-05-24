@@ -57,13 +57,13 @@ public class AppClass extends Application {
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.UP) {
+                if (keyEvent.getCode() == KeyCode.UP && board.getSnake(playerId).getDirection() != Direction.DOWN) {
                     board.getSnake(playerId).setDirection(Direction.UP);
-                } else if (keyEvent.getCode() == KeyCode.RIGHT) {
+                } else if (keyEvent.getCode() == KeyCode.RIGHT && board.getSnake(playerId).getDirection() != Direction.LEFT) {
                     board.getSnake(playerId).setDirection(Direction.RIGHT);
-                } else if (keyEvent.getCode() == KeyCode.DOWN) {
+                } else if (keyEvent.getCode() == KeyCode.DOWN && board.getSnake(playerId).getDirection() != Direction.UP) {
                     board.getSnake(playerId).setDirection(Direction.DOWN);
-                } else if (keyEvent.getCode() == KeyCode.LEFT) {
+                } else if (keyEvent.getCode() == KeyCode.LEFT && board.getSnake(playerId).getDirection() != Direction.RIGHT) {
                     board.getSnake(playerId).setDirection(Direction.LEFT);
                 }
                 
