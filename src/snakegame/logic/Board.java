@@ -46,10 +46,6 @@ public class Board {
         return board[y][x];
     }
 
-    public void setCellType (int x, int y, CellType value) {
-        getCell(x, y).setType(value);
-    }
-
     public int getWidth() {
         return width;
     }
@@ -77,8 +73,10 @@ public class Board {
     public void makeTurn() {
         for (Snake snake: getSnakesList()) {
             snake.snakeTarget();
-            if (Math.random() > 0.2) {
+            if (snake.getTarget().getType() != CellType.FOOD) {
                 snake.moveTail();
+            } else {
+                addFood();
             }
         }
 
@@ -89,5 +87,32 @@ public class Board {
                 snake.clear();
             }
         }
+    }
+
+    public boolean addFood(int x, int y) {
+        if (getCell(x, y).getType() != CellType.EMPTY) {
+            return false;
+        }
+
+        getCell(x, y).setType(CellType.FOOD);
+        return true;
+    }
+
+    public boolean addFood() {
+        Cell newFood = getFreeCells().get(new Random().nextInt(getFreeCells().size()));
+        return addFood(newFood.getX(), newFood.getY());
+    }
+
+    public List<Cell> getFreeCells() {
+        ArrayList<Cell> output = new ArrayList<Cell>();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (getCell(x, y).getType() == CellType.EMPTY) {
+                    output.add(getCell(x, y));
+                }
+            }
+        }
+
+        return output;
     }
 }

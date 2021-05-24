@@ -80,6 +80,7 @@ public class AppClass extends Application {
     public void newGame() {
         board = new Board(boardSizeX, boardSizeY);
         board.addSnake(5, 5, 1);
+        board.addFood();
     }
 
     public void drawBoard() {

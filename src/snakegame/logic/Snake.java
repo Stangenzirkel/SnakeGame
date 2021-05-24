@@ -9,7 +9,6 @@ import java.util.ArrayDeque;
 public class Snake {
     private Direction direction = Direction.LEFT;
     private ArrayDeque<Cell> body = new ArrayDeque<>();
-    private int length;
     private Board board;
     private final int id;
     private Cell target;
@@ -17,7 +16,6 @@ public class Snake {
     public Snake(int x, int y, Board board, int id) {
         body.add(board.getCell(x, y));
         board.getCell(x, y).setType(CellType.SNAKE);
-        length = 1;
         this.board = board;
         this.id = id;
     }
