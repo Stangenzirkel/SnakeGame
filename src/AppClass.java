@@ -12,8 +12,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import snakegame.logic.*;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.File;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class AppClass extends Application {
@@ -38,7 +38,6 @@ public class AppClass extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        System.out.println(javafx.scene.text.Font.getFamilies());
         stage.setTitle("Snake game");
         stage.setFullScreen(true);
         windowSizeX = (int) Screen.getPrimary().getBounds().getWidth();
@@ -67,7 +66,9 @@ public class AppClass extends Application {
                 timerSpeedLevel--;
             } else if (keyEvent.getCode() == KeyCode.DIGIT9 && timerSpeedLevel < timerSpeedArray.length - 1) {
                 timerSpeedLevel++;
-            }
+            } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
+                newGame();
+            } 
 
             // update();
         });
@@ -79,9 +80,13 @@ public class AppClass extends Application {
     }
 
     private void newGame() {
-        System.out.println("newGame");
         try {
-            board = Board.createBoard("./static/levels/1.txt");
+            File dir = new File("./static/levels"); //path указывает на директорию
+            File[] arrFiles = dir.listFiles();
+            String randomFilename = arrFiles[new Random().nextInt(arrFiles.length)].getCanonicalPath();
+            System.out.println(randomFilename);
+            board = Board.createBoard(randomFilename);
+            
             board.addFood();
             board.setSnake(3, 3);
 
@@ -147,7 +152,7 @@ public class AppClass extends Application {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setTextBaseline(VPos.TOP);
         gc.fillText(line, borderSizeX * 2 + (indentSize + cellSize) * boardSizeX,
-                borderSizeY + num * (TEXTSIZE + TEXTINDENT));
+                borderSizeMin + num * (TEXTSIZE + TEXTINDENT));
         
 
     }
@@ -179,7 +184,6 @@ public class AppClass extends Application {
     }
 
     private void gameOverFunc() throws InterruptedException {
-        System.out.println("gameOverFunc");
         GraphicsContext gc = canvas.getGraphicsContext2D();
         // gc.setFill(Color.BLACK);
         for (int i = 0; i < 5; i++) {
