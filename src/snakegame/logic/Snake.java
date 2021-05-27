@@ -2,22 +2,16 @@ package snakegame.logic;
 
 import java.util.ArrayDeque;
 
-/**
- * Author: Yuri Buyanov
- * Date: 24/05/2021 17:18
- */
 public class Snake {
     private Direction direction = Direction.LEFT;
-    private ArrayDeque<Cell> body = new ArrayDeque<>();
-    private Board board;
-    private final int id;
+    private final ArrayDeque<Cell> body = new ArrayDeque<>();
+    private final Board board;
     private Cell target;
 
-    public Snake(int x, int y, Board board, int id) {
+    public Snake(int x, int y, Board board) {
         body.add(board.getCell(x, y));
         board.getCell(x, y).setType(CellType.SNAKE);
         this.board = board;
-        this.id = id;
     }
 
     public Cell getHead() {
@@ -58,7 +52,5 @@ public class Snake {
         for (Cell cell: body) {
             cell.setType(CellType.EMPTY);
         }
-
-        board.getSnakes().remove(id);
     }
 }

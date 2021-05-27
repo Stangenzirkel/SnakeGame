@@ -1,12 +1,7 @@
 package snakegame.logic;
 
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
-/**
- * Author: Yuri Buyanov
- * Date: 24/05/2021 16:10
- */
 public enum CellType {
     EMPTY {
         @Override
@@ -32,6 +27,17 @@ public enum CellType {
         @Override
         public String toString() {
             return "SNAKE";
+        }
+
+        public Color getColor() {
+            return Color.WHITE;
+        }
+    },
+
+    WALL {
+        @Override
+        public String toString() {
+            return "WALL";
         }
 
         public Color getColor() {

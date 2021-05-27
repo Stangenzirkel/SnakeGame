@@ -1,11 +1,7 @@
 package snakegame.logic;
 
-/**
- * Author: Yuri Buyanov
- * Date: 24/05/2021 17:21
- */
 public class Cell {
-    private int x, y;
+    private final int x, y;
     private CellType type = CellType.EMPTY;
 
     public Cell(int x, int y) {

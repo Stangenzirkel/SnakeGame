@@ -1,34 +1,21 @@
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.canvas.*;
+import javafx.scene.input.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import snakegame.logic.Board;
-import snakegame.logic.CellType;
-import snakegame.logic.Direction;
-import snakegame.logic.Snake;
+import snakegame.logic.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Author: Yuri Buyanov
- * Date: 24/05/2021 15:24
- */
 public class AppClass extends Application {
     private final int boardSizeX = 30, boardSizeY = 20;
-    private final int cellSize = 20, indentSize = 2;
-    private final int windowSizeX = indentSize + (cellSize + indentSize) * boardSizeX,
-            windowSizeY = indentSize + (cellSize + indentSize) * boardSizeY;
-
-    private final int playerId = 1;
+    private int cellSize, indentSize = 5;
+    private int windowSizeX, windowSizeY;
+    private int borderSizeMin = 20, borderSizeX = 20, borderSizeY = 20;
     private long timerSpeed = 200;
 
     private Canvas canvas;
@@ -42,48 +29,54 @@ public class AppClass extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        newGame();
-        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+        stage.setTitle("Snake game");
+        stage.setFullScreen(true);
+        windowSizeX = (int) Screen.getPrimary().getBounds().getWidth();
+        windowSizeY = (int) Screen.getPrimary().getBounds().getHeight();
+        stage.setResizable(false);
 
         Group root = new Group();
         Scene scene = new Scene(root, windowSizeX, windowSizeY);
         scene.setFill(Color.WHITE);
+        cellSize = Math.min((windowSizeX - borderSizeMin * 2 - indentSize * (boardSizeX - 1)) / boardSizeX,
+                (windowSizeY - borderSizeMin * 2 - indentSize * (boardSizeY - 1)) / boardSizeY);
+
+        borderSizeX = (windowSizeX - cellSize * boardSizeX - indentSize * (boardSizeX - 1)) / 2;
+        borderSizeY = (windowSizeY - cellSize * boardSizeY - indentSize * (boardSizeY - 1)) / 2;
 
         canvas = new Canvas();
         canvas.setWidth(windowSizeX);
         canvas.setHeight(windowSizeY);
 
         canvas.setFocusTraversable(true);
-        canvas.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.UP && board.getSnake(playerId).getDirection() != Direction.DOWN) {
-                    board.getSnake(playerId).setDirection(Direction.UP);
-                } else if (keyEvent.getCode() == KeyCode.RIGHT && board.getSnake(playerId).getDirection() != Direction.LEFT) {
-                    board.getSnake(playerId).setDirection(Direction.RIGHT);
-                } else if (keyEvent.getCode() == KeyCode.DOWN && board.getSnake(playerId).getDirection() != Direction.UP) {
-                    board.getSnake(playerId).setDirection(Direction.DOWN);
-                } else if (keyEvent.getCode() == KeyCode.LEFT && board.getSnake(playerId).getDirection() != Direction.RIGHT) {
-                    board.getSnake(playerId).setDirection(Direction.LEFT);
-                }
-                
-                // update();
+        canvas.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.UP && board.getSnake().getDirection() != Direction.DOWN) {
+                board.getSnake().setDirection(Direction.UP);
+            } else if (keyEvent.getCode() == KeyCode.RIGHT && board.getSnake().getDirection() != Direction.LEFT) {
+                board.getSnake().setDirection(Direction.RIGHT);
+            } else if (keyEvent.getCode() == KeyCode.DOWN && board.getSnake().getDirection() != Direction.UP) {
+                board.getSnake().setDirection(Direction.DOWN);
+            } else if (keyEvent.getCode() == KeyCode.LEFT && board.getSnake().getDirection() != Direction.RIGHT) {
+                board.getSnake().setDirection(Direction.LEFT);
             }
+
+            // update();
         });
 
         root.getChildren().add(canvas);
 
         stage.setScene(scene);
-        stage.setTitle("Snake game");
 
+        newGame();
+        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
         drawBoard();
         stage.show();
     }
 
     private void newGame() {
         board = new Board(boardSizeX, boardSizeY);
-        board.addSnake(5, 5, 1);
         board.addFood();
+        board.setSnake(3, 3);
     }
 
     private void drawBoard() {
@@ -94,8 +87,8 @@ public class AppClass extends Application {
         for (int y = 0; y < boardSizeY; y++) {
             for (int x = 0; x < boardSizeX; x++) {
                 gc.setFill(board.getCell(x, y).getType().getColor());
-                gc.fillRect(indentSize + (indentSize + cellSize) * x,
-                        indentSize + (indentSize + cellSize) * y,
+                gc.fillRect(borderSizeX + (indentSize + cellSize) * x,
+                        borderSizeY + (indentSize + cellSize) * y,
                         cellSize,
                         cellSize);
             }
@@ -108,7 +101,7 @@ public class AppClass extends Application {
         board.makeTurn();
         drawBoard();
 
-        if (board.getSnake(playerId) == null) {
+        if (board.isGameOver()) {
             newGame();
         }
         timer = new Timer();
