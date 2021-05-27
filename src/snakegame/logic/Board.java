@@ -1,6 +1,8 @@
 package snakegame.logic;
 
+import java.io.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class Board {
     private final int width, height;
@@ -8,23 +10,73 @@ public class Board {
     private Snake snake;
     private boolean gameOver = false;
 
-    public Board(int width, int height) {
-        this.width = width;
-        this.height = height;
+    private Board(Cell [][] data) {
+        assert(data.length > 0);
+        assert(data[0].length > 0);
 
-        board = new Cell[height][width];
+        this.width = data[0].length;
+        this.height = data.length;
+        this.board = data;
+    }
+
+    public static Board createBoard(int width, int height) {
+        Cell [][] data = new Cell[height][width];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                board[y][x] = new Cell(x, y);
+                data[y][x] = new Cell(x, y);
             }
         }
+
+        return new Board(data);
+    }
+
+    public static Board createBoard(String fileName) throws FileNotFoundException, IOException {
+        File file = new File(fileName);
+        FileReader fr = new FileReader(file);
+        BufferedReader br = new BufferedReader(fr);
+        String line;
+        List<String> stringList = new ArrayList<>();
+
+        while((line = br.readLine()) != null){
+            if (line.contains(".") || line.contains("#") || line.contains("s")) {
+                stringList.add(line);
+            }
+        }
+
+        ArrayList<String> copyOfStringList = new ArrayList<String>(stringList);
+
+        Collections.sort(copyOfStringList, (o1, o2) -> o1.length() - o2.length());
+        Collections.reverse(copyOfStringList);
+
+        int width = copyOfStringList.get(0).length();
+        int height = copyOfStringList.size();
+
+        Cell [][] data = new Cell[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                data[y][x] = new Cell(x, y);
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            String row = stringList.get(y).concat(new String(new char[width - stringList.get(y).length()]).replace("\0", "-"));
+            for (int x = 0; x < width; x++) {
+                char sym = row.charAt(x);
+                if (sym == '#') {
+                    data[y][x].setType(CellType.WALL);
+                }
+
+            }
+        }
+
+        return new Board(data);
     }
 
     public void SOUTBoard() {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 System.out.print(getCell(x, y).getType());
-                System.out.print(" ");
+                System.out.print("\t");
             }
             System.out.println();
         }
@@ -63,7 +115,7 @@ public class Board {
             addFood();
         }
 
-        if (snake.getTarget().getType() != CellType.SNAKE) {
+        if (snake.getTarget().getType() != CellType.SNAKE && snake.getTarget().getType() != CellType.WALL) {
             snake.moveHead();
         } else {
             gameOver = true;

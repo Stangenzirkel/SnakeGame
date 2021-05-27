@@ -10,17 +10,20 @@ import snakegame.logic.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class AppClass extends Application {
-    private final int boardSizeX = 30, boardSizeY = 20;
-    private int cellSize, indentSize = 5;
-    private int windowSizeX, windowSizeY;
-    private int borderSizeMin = 20, borderSizeX = 20, borderSizeY = 20;
+    private final int indentSize = 5;
+    private final int borderSizeMin = 30;
+    private final int textZoneWidth = 200;
     private long timerSpeed = 200;
+
+    private int windowSizeX, windowSizeY;
+    private int boardSizeX, boardSizeY;
+    private int borderSizeX, borderSizeY, cellSize;
 
     private Canvas canvas;
     private Board board;
-
     private Timer timer = new Timer();
 
     public static void main(String[] args) {
@@ -38,11 +41,6 @@ public class AppClass extends Application {
         Group root = new Group();
         Scene scene = new Scene(root, windowSizeX, windowSizeY);
         scene.setFill(Color.WHITE);
-        cellSize = Math.min((windowSizeX - borderSizeMin * 2 - indentSize * (boardSizeX - 1)) / boardSizeX,
-                (windowSizeY - borderSizeMin * 2 - indentSize * (boardSizeY - 1)) / boardSizeY);
-
-        borderSizeX = (windowSizeX - cellSize * boardSizeX - indentSize * (boardSizeX - 1)) / 2;
-        borderSizeY = (windowSizeY - cellSize * boardSizeY - indentSize * (boardSizeY - 1)) / 2;
 
         canvas = new Canvas();
         canvas.setWidth(windowSizeX);
@@ -64,9 +62,7 @@ public class AppClass extends Application {
         });
 
         root.getChildren().add(canvas);
-
         stage.setScene(scene);
-
         newGame();
         timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
         drawBoard();
@@ -74,9 +70,28 @@ public class AppClass extends Application {
     }
 
     private void newGame() {
-        board = new Board(boardSizeX, boardSizeY);
-        board.addFood();
-        board.setSnake(3, 3);
+        System.out.println("newGame");
+        try {
+            board = Board.createBoard("./levels/1.txt");
+            board.addFood();
+            board.setSnake(3, 3);
+
+            boardSizeX = board.getWidth();
+            boardSizeY = board.getHeight();
+
+            cellSize = Math.min((windowSizeX - borderSizeMin * 2 - indentSize * (boardSizeX - 1) - textZoneWidth) / boardSizeX,
+                    (windowSizeY - borderSizeMin * 2 - indentSize * (boardSizeY - 1)) / boardSizeY);
+
+            borderSizeX = (windowSizeX - cellSize * boardSizeX - indentSize * (boardSizeX - 1) - textZoneWidth) / 2;
+            borderSizeY = (windowSizeY - cellSize * boardSizeY - indentSize * (boardSizeY - 1)) / 2;
+
+            System.out.println(boardSizeX);
+            System.out.println(boardSizeY);
+            System.out.println(cellSize);
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     private void drawBoard() {
@@ -99,12 +114,22 @@ public class AppClass extends Application {
         timer.cancel();
 
         board.makeTurn();
-        drawBoard();
 
         if (board.isGameOver()) {
-            newGame();
+            try {
+                gameOverFunc();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+        drawBoard();
         timer = new Timer();
         timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+    }
+
+    private void gameOverFunc() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(2);
+        newGame();
     }
 }
