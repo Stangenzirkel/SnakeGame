@@ -15,8 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class AppClass extends Application {
     private final int indentSize = 5;
     private final int borderSizeMin = 30;
-    private final int textZoneWidth = 200;
-    private long timerSpeed = 200;
+    private final int textZoneWidth = 300;
 
     private int windowSizeX, windowSizeY;
     private int boardSizeX, boardSizeY;
@@ -24,7 +23,10 @@ public class AppClass extends Application {
 
     private Canvas canvas;
     private Board board;
+
     private Timer timer = new Timer();
+    private int timerSpeedLevel = 3;
+    private final long [] timerSpeedArray= {50L, 100L, 200L, 350L, 600L};
 
     public static void main(String[] args) {
         launch(args);
@@ -56,6 +58,10 @@ public class AppClass extends Application {
                 board.getSnake().setDirection(Direction.DOWN);
             } else if (keyEvent.getCode() == KeyCode.LEFT && board.getSnake().getDirection() != Direction.RIGHT) {
                 board.getSnake().setDirection(Direction.LEFT);
+            } else if (keyEvent.getCode() == KeyCode.DIGIT0 && timerSpeedLevel > 0) {
+                timerSpeedLevel--;
+            } else if (keyEvent.getCode() == KeyCode.DIGIT9 && timerSpeedLevel < timerSpeedArray.length - 1) {
+                timerSpeedLevel++;
             }
 
             // update();
@@ -88,7 +94,7 @@ public class AppClass extends Application {
         }
 
         timer = new Timer();
-        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
         drawBoard();
     }
 
@@ -124,7 +130,7 @@ public class AppClass extends Application {
         else {
             drawBoard();
             timer = new Timer();
-            timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+            timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
         }
     }
 
