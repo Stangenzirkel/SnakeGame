@@ -109,13 +109,14 @@ public class Board {
 
     public void makeTurn() {
         snake.snakeTarget();
-        if (snake.getTarget().getType() != CellType.FOOD) {
-            snake.moveTail();
-        } else {
-            addFood();
-        }
 
-        if (snake.getTarget().getType() != CellType.SNAKE && snake.getTarget().getType() != CellType.WALL) {
+        if ((snake.getTarget().getType() != CellType.SNAKE || snake.getTarget() == snake.getTail()) && snake.getTarget().getType() != CellType.WALL) {
+            if (snake.getTarget().getType() != CellType.FOOD) {
+                snake.moveTail();
+            } else {
+                addFood();
+            }
+            
             snake.moveHead();
         } else {
             gameOver = true;

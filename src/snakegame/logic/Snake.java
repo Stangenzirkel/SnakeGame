@@ -14,8 +14,16 @@ public class Snake {
         this.board = board;
     }
 
+    public Cell [] getBody() {
+        return body.toArray(Cell[]::new);
+    }
+
     public Cell getHead() {
         return body.getLast();
+    }
+
+    public Cell getTail() {
+        return body.getFirst();
     }
 
     public Cell getTarget() {

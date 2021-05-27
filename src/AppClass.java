@@ -64,8 +64,6 @@ public class AppClass extends Application {
         root.getChildren().add(canvas);
         stage.setScene(scene);
         newGame();
-        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
-        drawBoard();
         stage.show();
     }
 
@@ -85,13 +83,13 @@ public class AppClass extends Application {
             borderSizeX = (windowSizeX - cellSize * boardSizeX - indentSize * (boardSizeX - 1) - textZoneWidth) / 2;
             borderSizeY = (windowSizeY - cellSize * boardSizeY - indentSize * (boardSizeY - 1)) / 2;
 
-            System.out.println(boardSizeX);
-            System.out.println(boardSizeY);
-            System.out.println(cellSize);
-
         } catch (Exception e) {
             System.out.println(e);
         }
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+        drawBoard();
     }
 
     private void drawBoard() {
@@ -123,13 +121,44 @@ public class AppClass extends Application {
             }
         }
 
-        drawBoard();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+        else {
+            drawBoard();
+            timer = new Timer();
+            timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeed);
+        }
+    }
+
+    private void blackAll(Color color) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(color);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     private void gameOverFunc() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(2);
+        System.out.println("gameOverFunc");
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        // gc.setFill(Color.BLACK);
+        for (int i = 0; i < 5; i++) {
+            gc.setFill(CellType.EMPTY.getColor());
+            // blackAll(CellType.EMPTY.getColor());
+            for (Cell cell: board.getSnake().getBody()) {
+                gc.fillRect(borderSizeX + (indentSize + cellSize) * cell.getX(),
+                        borderSizeY + (indentSize + cellSize) * cell.getY(),
+                        cellSize,
+                        cellSize);
+            }
+            TimeUnit.MILLISECONDS.sleep(200);
+
+            gc.setFill(CellType.SNAKE.getColor());
+            // blackAll(CellType.SNAKE.getColor());
+            for (Cell cell: board.getSnake().getBody()) {
+                gc.fillRect(borderSizeX + (indentSize + cellSize) * cell.getX(),
+                        borderSizeY + (indentSize + cellSize) * cell.getY(),
+                        cellSize,
+                        cellSize);
+            }
+            TimeUnit.MILLISECONDS.sleep(200);
+        }
         newGame();
     }
 }
