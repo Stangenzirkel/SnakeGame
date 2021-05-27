@@ -1,9 +1,13 @@
 import javafx.application.Application;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.*;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import snakegame.logic.*;
@@ -15,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class AppClass extends Application {
     private final int indentSize = 5;
     private final int borderSizeMin = 30;
-    private final int textZoneWidth = 300;
+    private final int textZoneWidth = 350;
 
     private int windowSizeX, windowSizeY;
     private int boardSizeX, boardSizeY;
@@ -26,7 +30,7 @@ public class AppClass extends Application {
 
     private Timer timer = new Timer();
     private int timerSpeedLevel = 3;
-    private final long [] timerSpeedArray= {50L, 100L, 200L, 350L, 600L};
+    private final long [] timerSpeedArray= {50L, 70L, 100L, 150L, 200L};
 
     public static void main(String[] args) {
         launch(args);
@@ -34,6 +38,7 @@ public class AppClass extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        System.out.println(javafx.scene.text.Font.getFamilies());
         stage.setTitle("Snake game");
         stage.setFullScreen(true);
         windowSizeX = (int) Screen.getPrimary().getBounds().getWidth();
@@ -50,13 +55,13 @@ public class AppClass extends Application {
 
         canvas.setFocusTraversable(true);
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.UP && board.getSnake().getDirection() != Direction.DOWN) {
+            if (keyEvent.getCode() == KeyCode.UP) {
                 board.getSnake().setDirection(Direction.UP);
-            } else if (keyEvent.getCode() == KeyCode.RIGHT && board.getSnake().getDirection() != Direction.LEFT) {
+            } else if (keyEvent.getCode() == KeyCode.RIGHT) {
                 board.getSnake().setDirection(Direction.RIGHT);
-            } else if (keyEvent.getCode() == KeyCode.DOWN && board.getSnake().getDirection() != Direction.UP) {
+            } else if (keyEvent.getCode() == KeyCode.DOWN) {
                 board.getSnake().setDirection(Direction.DOWN);
-            } else if (keyEvent.getCode() == KeyCode.LEFT && board.getSnake().getDirection() != Direction.RIGHT) {
+            } else if (keyEvent.getCode() == KeyCode.LEFT) {
                 board.getSnake().setDirection(Direction.LEFT);
             } else if (keyEvent.getCode() == KeyCode.DIGIT0 && timerSpeedLevel > 0) {
                 timerSpeedLevel--;
@@ -76,7 +81,7 @@ public class AppClass extends Application {
     private void newGame() {
         System.out.println("newGame");
         try {
-            board = Board.createBoard("./levels/1.txt");
+            board = Board.createBoard("./static/levels/1.txt");
             board.addFood();
             board.setSnake(3, 3);
 
@@ -106,12 +111,45 @@ public class AppClass extends Application {
         for (int y = 0; y < boardSizeY; y++) {
             for (int x = 0; x < boardSizeX; x++) {
                 gc.setFill(board.getCell(x, y).getType().getColor());
-                gc.fillRect(borderSizeX + (indentSize + cellSize) * x,
-                        borderSizeY + (indentSize + cellSize) * y,
-                        cellSize,
-                        cellSize);
+                // Боже храни костыли
+                if (board.getCell(x, y).getType() == CellType.WALL) {
+                    int wallIndentSize = 4;
+                    gc.fillRect(borderSizeX + (indentSize + cellSize) * x,
+                            borderSizeY + (indentSize + cellSize) * y,
+                            cellSize,
+                            (cellSize - wallIndentSize) / 2);
+
+                    gc.fillRect(borderSizeX + (indentSize + cellSize) * x,
+                            borderSizeY + (indentSize + cellSize) * y + (cellSize - wallIndentSize) / 2 + wallIndentSize,
+                            cellSize,
+                            (cellSize - wallIndentSize) / 2);
+
+                } else {
+                    gc.fillRect(borderSizeX + (indentSize + cellSize) * x,
+                            borderSizeY + (indentSize + cellSize) * y,
+                            cellSize,
+                            cellSize);
+                }
             }
         }
+
+        drawText("Score:", 0);
+        drawText(Integer.toString(board.getSnake().getLength()), 1);
+        drawText("Game speed: ", 2);
+        drawText(new String(new char[timerSpeedArray.length - timerSpeedLevel]).replace("\0", "|"), 3);
+    }
+
+    private void drawText(String line, int num) {
+        int TEXTSIZE = 50, TEXTINDENT = 0;
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.loadFont("file:./static/19187.ttf", TEXTSIZE));
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.setTextBaseline(VPos.TOP);
+        gc.fillText(line, borderSizeX * 2 + (indentSize + cellSize) * boardSizeX,
+                borderSizeY + num * (TEXTSIZE + TEXTINDENT));
+        
+
     }
 
     private void update() {

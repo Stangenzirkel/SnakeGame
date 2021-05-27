@@ -41,7 +41,7 @@ public enum CellType {
         }
 
         public Color getColor() {
-            return Color.RED;
+            return Color.GRAY;
         }
     };
 

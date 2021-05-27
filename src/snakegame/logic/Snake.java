@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 
 public class Snake {
     private Direction direction = Direction.LEFT;
+    private Direction newDirection = direction;
     private final ArrayDeque<Cell> body = new ArrayDeque<>();
     private final Board board;
     private Cell target;
@@ -12,6 +13,10 @@ public class Snake {
         body.add(board.getCell(x, y));
         board.getCell(x, y).setType(CellType.SNAKE);
         this.board = board;
+    }
+
+    public int getLength() {
+        return body.size();
     }
 
     public Cell [] getBody() {
@@ -35,7 +40,13 @@ public class Snake {
     }
 
     public void setDirection(Direction direction) {
-        this.direction = direction;
+        this.newDirection = direction;
+    }
+
+    public void applyDirection() {
+        if (direction.getReverse() != newDirection) {
+            direction = newDirection;
+        }
     }
 
     public void snakeTarget() {

@@ -45,7 +45,7 @@ public class Board {
 
         ArrayList<String> copyOfStringList = new ArrayList<String>(stringList);
 
-        Collections.sort(copyOfStringList, (o1, o2) -> o1.length() - o2.length());
+        Collections.sort(copyOfStringList, Comparator.comparingInt(String::length));
         Collections.reverse(copyOfStringList);
 
         int width = copyOfStringList.get(0).length();
@@ -59,7 +59,7 @@ public class Board {
         }
 
         for (int y = 0; y < height; y++) {
-            String row = stringList.get(y).concat(new String(new char[width - stringList.get(y).length()]).replace("\0", "-"));
+            String row = stringList.get(y).concat(new String(new char[width - stringList.get(y).length()]).replace("\0", "."));
             for (int x = 0; x < width; x++) {
                 char sym = row.charAt(x);
                 if (sym == '#') {
@@ -108,6 +108,7 @@ public class Board {
     }
 
     public void makeTurn() {
+        snake.applyDirection();
         snake.snakeTarget();
 
         if ((snake.getTarget().getType() != CellType.SNAKE || snake.getTarget() == snake.getTail()) && snake.getTarget().getType() != CellType.WALL) {
