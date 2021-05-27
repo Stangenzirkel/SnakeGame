@@ -31,6 +31,7 @@ public class AppClass extends Application {
     private Timer timer = new Timer();
     private int timerSpeedLevel = 3;
     private final long [] timerSpeedArray= {50L, 70L, 100L, 150L, 200L};
+    private boolean onPause = false;
 
     public static void main(String[] args) {
         launch(args);
@@ -68,7 +69,93 @@ public class AppClass extends Application {
                 timerSpeedLevel++;
             } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
                 newGame();
-            } 
+            } else if (keyEvent.getCode() == KeyCode.SPACE) {
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+
+                if (onPause) {
+                    Timer waiter0 = new Timer();
+                    waiter0.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            drawBoard();
+                            gc.setFill(Color.WHITE);
+                            gc.setTextBaseline(VPos.CENTER);
+                            gc.setTextAlign(TextAlignment.CENTER);
+                            gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                            gc.fillText("3", (windowSizeX - textZoneWidth) / 2,
+                                    windowSizeY / 2);
+                        }
+                    }, 0);
+
+                    Timer waiter1 = new Timer();
+                    waiter1.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            drawBoard();
+                            gc.setFill(Color.WHITE);
+                            gc.setTextBaseline(VPos.CENTER);
+                            gc.setTextAlign(TextAlignment.CENTER);
+                            gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                            gc.fillText("2", (windowSizeX - textZoneWidth) / 2,
+                                windowSizeY / 2);
+                        }
+                    }, 1000);
+
+                    Timer waiter2 = new Timer();
+                    waiter2.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            drawBoard();
+                            gc.setFill(Color.WHITE);
+                            gc.setTextBaseline(VPos.CENTER);
+                            gc.setTextAlign(TextAlignment.CENTER);
+                            gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                            gc.fillText("1", (windowSizeX - textZoneWidth) / 2,
+                                    windowSizeY / 2);
+                        }
+                    }, 2000);
+
+                    Timer waiter3 = new Timer();
+                    waiter3.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            drawBoard();
+                            timer = new Timer();
+                            timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
+                            onPause = false;
+                        }
+                    }, 3000);
+
+//                    try {
+//                        drawBoard();
+//                        gc.fillText("3", (windowSizeX - textZoneWidth) / 2,
+//                                windowSizeY / 2);
+//                        Thread.sleep(1000);
+//
+//                        drawBoard();
+//                        gc.fillText("2", (windowSizeX - textZoneWidth) / 2,
+//                                windowSizeY / 2);
+//                        Thread.sleep(1000);
+//
+//                        drawBoard();
+//                        gc.fillText("1", (windowSizeX - textZoneWidth) / 2,
+//                                windowSizeY / 2);
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+
+                } else {
+                    timer.cancel();
+                    onPause = true;
+                    gc.setFill(Color.WHITE);
+                    gc.setTextBaseline(VPos.CENTER);
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                    gc.fillText("PAUSED", (windowSizeX - textZoneWidth) / 2,
+                            windowSizeY / 2);
+                }
+            }
 
             // update();
         });
