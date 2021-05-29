@@ -1,6 +1,7 @@
 package snakegame.logic;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 
 public class Snake {
     private Direction direction;
@@ -79,5 +80,16 @@ public class Snake {
         for (Cell cell: body) {
             cell.setType(CellType.EMPTY);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Snake{" +
+                "direction=" + direction +
+                ", body=" + Arrays.toString(getBody()) +
+                ", head=" + getHead() +
+                ", tail=" + getTail() +
+                ", length=" + getLength() +
+                '}';
     }
 }

@@ -2,7 +2,6 @@ package snakegame.logic;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Board {
     private final int width, height;
@@ -77,10 +76,7 @@ public class Board {
 
         Board out = new Board(data);
         out.addSnake(Integer.parseInt(header[0]), Integer.parseInt(header[1]), Integer.parseInt(header[2]), Direction.getDirection(header[3], Direction.LEFT));
-        System.out.println(out.getSnake().getDirection());
-        System.out.println(out.getSnake().getHead());
-        System.out.println(out.getSnake().getTail());
-        System.out.println(Arrays.toString(out.getSnake().getBody()));
+//        System.out.println(out.getSnake());
         return out;
     }
 
