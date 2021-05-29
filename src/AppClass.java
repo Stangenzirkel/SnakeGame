@@ -74,7 +74,7 @@ public class AppClass extends Application {
                 timerSpeedLevel--;
             } else if (keyEvent.getCode() == KeyCode.DIGIT9 && timerSpeedLevel < timerSpeedArray.length - 1) {
                 timerSpeedLevel++;
-            } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
+            } else if (keyEvent.getCode() == KeyCode.BACK_SPACE && onPause) {
                 newGame();
             } else if (keyEvent.getCode() == KeyCode.SPACE) {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -109,9 +109,12 @@ public class AppClass extends Application {
         gc.fillText(mainText, (windowSizeX - textZoneWidth) / 2,
                 windowSizeY / 2);
 
-        gc.setFont(Font.loadFont("file:./static/19187.ttf", 30));
+        gc.setFont(Font.loadFont("file:./static/19187.ttf", 50));
         gc.fillText("press SPACE to start", (windowSizeX - textZoneWidth) / 2,
-                windowSizeY / 2 + 70);
+                windowSizeY / 2 + 100);
+
+        gc.fillText("press BACKSPACE to restart", (windowSizeX - textZoneWidth) / 2,
+                windowSizeY / 2 + 140);
     }
 
     private void setOnPause(GraphicsContext gc) {
@@ -185,7 +188,6 @@ public class AppClass extends Application {
             board = Board.createBoard(randomFilename);
             
             board.addFood();
-            board.addSnake(3, 3);
 
             boardSizeX = board.getWidth();
             boardSizeY = board.getHeight();

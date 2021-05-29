@@ -9,4 +9,16 @@ public enum Direction {
     public abstract int getX();
     public abstract int getY();
     public abstract Direction getReverse();
+    public static Direction getDirection(String str, Direction elseVar) {
+        if (str.equals("UP"))
+            return Direction.UP;
+        else if (str.equals("RIGHT"))
+            return Direction.RIGHT;
+        else if (str.equals("DOWN"))
+            return Direction.DOWN;
+        else if (str.equals("LEFT"))
+            return Direction.LEFT;
+        else
+            return elseVar;
+    }
 }

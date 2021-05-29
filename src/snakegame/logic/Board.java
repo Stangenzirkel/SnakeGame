@@ -27,7 +27,9 @@ public class Board {
             }
         }
 
-        return new Board(data);
+        Board out = new Board(data);
+        out.addSnake(3, 3, 3, Direction.LEFT);
+        return out;
     }
 
     public static Board createBoard(String fileName) throws FileNotFoundException, IOException {
@@ -35,6 +37,10 @@ public class Board {
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
         String line;
+        String [] header = br.readLine().split(" ");
+        if (header.length != 4) {
+            throw new IOException();
+        }
         List<String> stringList = new ArrayList<>();
 
         while((line = br.readLine()) != null){
@@ -43,7 +49,7 @@ public class Board {
             }
         }
 
-        ArrayList<String> copyOfStringList = new ArrayList<String>(stringList);
+        ArrayList<String> copyOfStringList = new ArrayList<>(stringList);
 
         Collections.sort(copyOfStringList, Comparator.comparingInt(String::length));
         Collections.reverse(copyOfStringList);
@@ -69,7 +75,13 @@ public class Board {
             }
         }
 
-        return new Board(data);
+        Board out = new Board(data);
+        out.addSnake(Integer.parseInt(header[0]), Integer.parseInt(header[1]), Integer.parseInt(header[2]), Direction.getDirection(header[3], Direction.LEFT));
+        System.out.println(out.getSnake().getDirection());
+        System.out.println(out.getSnake().getHead());
+        System.out.println(out.getSnake().getTail());
+        System.out.println(Arrays.toString(out.getSnake().getBody()));
+        return out;
     }
 
     public void SOUTBoard() {
@@ -82,8 +94,8 @@ public class Board {
         }
     }
 
-    public void addSnake(int x, int y) {
-        snake = new Snake(x, y, 3,this);
+    public void addSnake(int x, int y, int length, Direction direction) {
+        snake = new Snake(x, y, length, direction, this);
     }
 
     public Snake getSnake() {

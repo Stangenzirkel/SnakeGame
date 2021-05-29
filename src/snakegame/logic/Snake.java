@@ -3,18 +3,24 @@ package snakegame.logic;
 import java.util.ArrayDeque;
 
 public class Snake {
-    private Direction direction = Direction.LEFT;
-    private Direction newDirection = direction;
+    private Direction direction;
+    private Direction newDirection;
     private final ArrayDeque<Cell> body = new ArrayDeque<>();
     private final Board board;
     private Cell target;
 
-    public Snake(int x, int y, int length, Board board) {
+    public Snake(int x, int y, int length, Direction direction, Board board) {
         for (int i = 0; i < length; i++) {
-            body.addFirst(board.getCell(x + i, y));
-            board.getCell(x + i, y).setType(CellType.SNAKE);
+            int newX = (x + direction.getX() * -i) % board.getWidth();
+            newX = newX < 0 ? board.getWidth() + newX : newX;
+            int newY = (y + direction.getY() * -i) % board.getHeight();
+            newY = newY < 0 ? board.getHeight() + newY : newY;
+            body.addFirst(board.getCell(newX, newY));
+            board.getCell(newX, newY).setType(CellType.SNAKE);
         }
         this.board = board;
+        this.direction = direction;
+        this.newDirection = direction;
     }
 
     public int getLength() {
