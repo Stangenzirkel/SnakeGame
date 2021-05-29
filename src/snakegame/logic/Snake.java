@@ -9,9 +9,11 @@ public class Snake {
     private final Board board;
     private Cell target;
 
-    public Snake(int x, int y, Board board) {
-        body.add(board.getCell(x, y));
-        board.getCell(x, y).setType(CellType.SNAKE);
+    public Snake(int x, int y, int length, Board board) {
+        for (int i = 0; i < length; i++) {
+            body.addFirst(board.getCell(x + i, y));
+            board.getCell(x + i, y).setType(CellType.SNAKE);
+        }
         this.board = board;
     }
 

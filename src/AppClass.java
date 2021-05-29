@@ -2,18 +2,25 @@ import javafx.application.Application;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.*;
-import javafx.scene.input.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import snakegame.logic.*;
+
+import snakegame.logic.Board;
+import snakegame.logic.Cell;
+import snakegame.logic.CellType;
+import snakegame.logic.Direction;
 
 import java.io.File;
-import java.util.*;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class AppClass extends Application {
@@ -73,87 +80,10 @@ public class AppClass extends Application {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
 
                 if (onPause) {
-                    Timer waiter0 = new Timer();
-                    waiter0.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            drawBoard();
-                            gc.setFill(Color.WHITE);
-                            gc.setTextBaseline(VPos.CENTER);
-                            gc.setTextAlign(TextAlignment.CENTER);
-                            gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
-                            gc.fillText("3", (windowSizeX - textZoneWidth) / 2,
-                                    windowSizeY / 2);
-                        }
-                    }, 0);
-
-                    Timer waiter1 = new Timer();
-                    waiter1.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            drawBoard();
-                            gc.setFill(Color.WHITE);
-                            gc.setTextBaseline(VPos.CENTER);
-                            gc.setTextAlign(TextAlignment.CENTER);
-                            gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
-                            gc.fillText("2", (windowSizeX - textZoneWidth) / 2,
-                                windowSizeY / 2);
-                        }
-                    }, 1000);
-
-                    Timer waiter2 = new Timer();
-                    waiter2.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            drawBoard();
-                            gc.setFill(Color.WHITE);
-                            gc.setTextBaseline(VPos.CENTER);
-                            gc.setTextAlign(TextAlignment.CENTER);
-                            gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
-                            gc.fillText("1", (windowSizeX - textZoneWidth) / 2,
-                                    windowSizeY / 2);
-                        }
-                    }, 2000);
-
-                    Timer waiter3 = new Timer();
-                    waiter3.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            drawBoard();
-                            timer = new Timer();
-                            timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
-                            onPause = false;
-                        }
-                    }, 3000);
-
-//                    try {
-//                        drawBoard();
-//                        gc.fillText("3", (windowSizeX - textZoneWidth) / 2,
-//                                windowSizeY / 2);
-//                        Thread.sleep(1000);
-//
-//                        drawBoard();
-//                        gc.fillText("2", (windowSizeX - textZoneWidth) / 2,
-//                                windowSizeY / 2);
-//                        Thread.sleep(1000);
-//
-//                        drawBoard();
-//                        gc.fillText("1", (windowSizeX - textZoneWidth) / 2,
-//                                windowSizeY / 2);
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
+                    unPause(gc);
 
                 } else {
-                    timer.cancel();
-                    onPause = true;
-                    gc.setFill(Color.WHITE);
-                    gc.setTextBaseline(VPos.CENTER);
-                    gc.setTextAlign(TextAlignment.CENTER);
-                    gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
-                    gc.fillText("PAUSED", (windowSizeX - textZoneWidth) / 2,
-                            windowSizeY / 2);
+                    setOnPause(gc);
                 }
             }
 
@@ -166,6 +96,86 @@ public class AppClass extends Application {
         stage.show();
     }
 
+    private void setOnPause(GraphicsContext gc, String mainText) {
+        if (!onPause) {
+            drawBoard();
+            timer.cancel();
+            onPause = true;
+        }
+        gc.setFill(Color.WHITE);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+        gc.fillText(mainText, (windowSizeX - textZoneWidth) / 2,
+                windowSizeY / 2);
+
+        gc.setFont(Font.loadFont("file:./static/19187.ttf", 30));
+        gc.fillText("press SPACE to start", (windowSizeX - textZoneWidth) / 2,
+                windowSizeY / 2 + 70);
+    }
+
+    private void setOnPause(GraphicsContext gc) {
+        setOnPause(gc, "PAUSED");
+    }
+
+    private void unPause(GraphicsContext gc) {
+        if (!onPause) {
+            return;
+        }
+        Timer waiter0 = new Timer();
+        waiter0.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                drawBoard();
+                gc.setFill(Color.WHITE);
+                gc.setTextBaseline(VPos.CENTER);
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                gc.fillText("3", (windowSizeX - textZoneWidth) / 2,
+                        windowSizeY / 2);
+            }
+        }, 0);
+
+        Timer waiter1 = new Timer();
+        waiter1.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                drawBoard();
+                gc.setFill(Color.WHITE);
+                gc.setTextBaseline(VPos.CENTER);
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                gc.fillText("2", (windowSizeX - textZoneWidth) / 2,
+                        windowSizeY / 2);
+            }
+        }, 1000);
+
+        Timer waiter2 = new Timer();
+        waiter2.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                drawBoard();
+                gc.setFill(Color.WHITE);
+                gc.setTextBaseline(VPos.CENTER);
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setFont(Font.loadFont("file:./static/19187.ttf", 150));
+                gc.fillText("1", (windowSizeX - textZoneWidth) / 2,
+                        windowSizeY / 2);
+            }
+        }, 2000);
+
+        Timer waiter3 = new Timer();
+        waiter3.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                drawBoard();
+                timer = new Timer();
+                timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
+                onPause = false;
+            }
+        }, 3000);
+    }
+
     private void newGame() {
         try {
             File dir = new File("./static/levels"); //path указывает на директорию
@@ -175,7 +185,7 @@ public class AppClass extends Application {
             board = Board.createBoard(randomFilename);
             
             board.addFood();
-            board.setSnake(3, 3);
+            board.addSnake(3, 3);
 
             boardSizeX = board.getWidth();
             boardSizeY = board.getHeight();
@@ -190,9 +200,10 @@ public class AppClass extends Application {
             System.out.println(e);
         }
 
-        timer = new Timer();
-        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
+//        timer = new Timer();
+//        timer.schedule(new TimerTask() {public void run() { update(); }}, timerSpeedArray[timerSpeedLevel]);
         drawBoard();
+        setOnPause(canvas.getGraphicsContext2D(), "NEW GAME");
     }
 
     private void drawBoard() {
@@ -226,7 +237,7 @@ public class AppClass extends Application {
         }
 
         drawText("Score:", 0);
-        drawText(Integer.toString(board.getSnake().getLength()), 1);
+        drawText(Integer.toString(board.getSnake().getLength() * 5), 1);
         drawText("Game speed: ", 2);
         drawText(new String(new char[timerSpeedArray.length - timerSpeedLevel]).replace("\0", "|"), 3);
     }
@@ -264,7 +275,7 @@ public class AppClass extends Application {
         }
     }
 
-    private void blackAll(Color color) {
+    private void fillAll(Color color) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(color);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());

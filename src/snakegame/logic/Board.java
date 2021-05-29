@@ -80,11 +80,10 @@ public class Board {
             }
             System.out.println();
         }
-
     }
 
-    public void setSnake(int x, int y) {
-        snake = new Snake(x, y, this);
+    public void addSnake(int x, int y) {
+        snake = new Snake(x, y, 3,this);
     }
 
     public Snake getSnake() {
